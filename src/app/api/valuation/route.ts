@@ -45,7 +45,7 @@ IMPORTANT RULES:
   "confidence": confidence percentage between 85 and 99`
 
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${geminiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -56,7 +56,7 @@ IMPORTANT RULES:
                 temperature: 0.2,
               },
             }),
-            signal: AbortSignal.timeout(5000),
+            signal: AbortSignal.timeout(7000),
           }
         )
 
@@ -77,8 +77,8 @@ IMPORTANT RULES:
                     mid: Math.round(aiParsed.mid),
                     high: Math.round(aiParsed.high),
                     marketSummary: aiParsed.reasoning || baseline.marketSummary,
-                    confidence: aiParsed.confidence || 96,
-                    engine: 'Gemini-1.5-Flash (AI Appraisal)',
+                    confidence: aiParsed.confidence || 97,
+                    engine: 'Gemini AI Intelligence (Google)',
                   },
                 })
               }
@@ -104,3 +104,4 @@ IMPORTANT RULES:
     )
   }
 }
+
