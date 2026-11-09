@@ -129,26 +129,26 @@ export const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h5 className="text-white text-xs font-semibold uppercase tracking-wider mb-4">Administration</h5>
+            <h5 className="text-white text-xs font-semibold uppercase tracking-wider mb-4">Guarantees</h5>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/admin" className="hover:text-white transition-colors">
-                  Control Room
+                <Link href="/swap" className="hover:text-white transition-colors">
+                  14-Day Price Lock
                 </Link>
               </li>
               <li>
-                <Link href="/admin/swaps" className="hover:text-white transition-colors">
-                  Review Swaps
+                <Link href="/swap" className="hover:text-white transition-colors">
+                  Clear Title Transfer
                 </Link>
               </li>
               <li>
-                <Link href="/admin/payments" className="hover:text-white transition-colors">
-                  Review Payments
+                <Link href="/lineup" className="hover:text-white transition-colors">
+                  Doorstep Collection
                 </Link>
               </li>
               <li>
-                <Link href="/admin/markets" className="hover:text-white transition-colors">
-                  Valuation Marks
+                <Link href="/markets" className="hover:text-white transition-colors">
+                  Liquid Market Feeds
                 </Link>
               </li>
             </ul>
