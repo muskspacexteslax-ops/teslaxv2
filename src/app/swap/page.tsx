@@ -22,14 +22,14 @@ function SwapContent() {
   const [submittedRef, setSubmittedRef] = useState<string>('')
 
   // Form fields
-  const [make, setMake] = useState('Toyota')
-  const [model, setModel] = useState('Corolla')
-  const [year, setYear] = useState('2018')
-  const [mileage, setMileage] = useState('65000')
+  const [make, setMake] = useState('')
+  const [model, setModel] = useState('')
+  const [year, setYear] = useState('')
+  const [mileage, setMileage] = useState('')
   const [fuel, setFuel] = useState('petrol')
   const [transmission, setTransmission] = useState('automatic')
   const [condition, setCondition] = useState('good')
-  const [owners, setOwners] = useState('1')
+  const [owners, setOwners] = useState('')
   const [serviceHistory, setServiceHistory] = useState('full')
   const [accidentHistory, setAccidentHistory] = useState('none')
   const [targetSlug, setTargetSlug] = useState(initialTarget)
@@ -76,7 +76,7 @@ function SwapContent() {
       condition,
       fuel,
       transmission,
-      owners,
+      owners: owners || 1,
       service_history: serviceHistory,
       accident_history: accidentHistory,
     }
@@ -134,7 +134,7 @@ function SwapContent() {
       fuel,
       transmission,
       condition,
-      owners,
+      owners: owners || 1,
       service_history: serviceHistory,
       accident_history: accidentHistory,
       target_slug: targetModel?.slug || '',
