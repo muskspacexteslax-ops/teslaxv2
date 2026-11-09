@@ -1,123 +1,170 @@
-# TeslaX — Next.js + Tailwind CSS
+# TeslaX — EV Trade-in & Autonomous Market Platform
 
-A high-performance web platform for trading petrol vehicles for Teslas, managing trade-in valuations, vehicle leases, wallet balances, and private market tracking (TSLA, SpaceX, X).
+TeslaX is a high-performance web platform engineered for trading internal combustion engine (ICE) vehicles directly for Teslas. It features an **AI-powered trade-in appraisal engine**, real-time equity & private asset markets (TSLA, SpaceX, X), member wallet ledgering, and an administrative control room.
 
-Converted from Hono JSX views to a modern **Next.js (App Router)** and **Tailwind CSS** application with full client-side state management, interactive components, and administration tools.
+Built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, and backed by **MongoDB Atlas**, **Google Gemini AI**, and **Finnhub Live Feeds**.
 
 ---
 
-## Architecture Overview
+## ⚡ Core Capabilities
+
+### 1. AI-Powered Vehicle Appraisal Engine (`/swap`)
+* **Gemini 3.5 Flash Integration:** Connects directly to Google Gemini API for analytical wholesale trade appraisals, real-time market commentary, and confidence scoring.
+* **Black Book Algorithmic Fallback:** Comprehensive 50+ model knowledge base with original base MSRP baselines, real-world age depreciation curves, steep mileage degradation cliffs, and age-tiered salvage floors.
+* **3-Layer Quota Shield:**
+  1. **24-Hour In-Memory Cache:** Hashed vehicle traits and 2,500-mile buckets eliminate 80–90% of redundant API calls with 0ms latency.
+  2. **Invisible Honeypot Anti-Bot Shield:** Traps scrapers and headless bots, preventing them from exhausting API quotas.
+  3. **Soft Per-IP Rate Limiting:** Allows up to 8 fresh valuations per 10 minutes per IP. Any overflow automatically falls back to local algorithmic valuation without breaking user experience.
+* **Modern Drag-and-Drop Uploader:** File drag-over states, live upload progress simulation, image preview, removal, and direct URL import.
+
+### 2. Live Market Feeds & Asset Tracking (`/markets`)
+* **Finnhub API Integration:** Real-time market quotes and percentage updates for TSLA (NASDAQ).
+* **Yahoo Finance Historicals:** 30-day interactive SVG charts with crosshairs and timeframe filters (1D, 1W, 1M, 1Y, ALL).
+* **Desk-Marked Private Equity:** Track and trade private tokens for **SpaceX (`SPCX`)** and **X Corp (`X`)** anchored to institutional marks.
+* **Paper Trading & Portfolio Ledger:** Execute buy/sell orders, track real-time position cost bases, unrealized P/L, and cash balances.
+
+### 3. Member Portal (`/dashboard`)
+* **Overview & KPI Cards:** Live trade-in status, total portfolio valuation, and cash wallet balance.
+* **Vehicle Showroom (`/dashboard/showroom`):** Apply evaluated trade-in credits towards brand-new Teslas (Cybertruck, Model 3, Model Y, Model S, Model X, Semi, Roadster).
+* **Wallet Management (`/dashboard/wallet`):** Simulated card top-ups, bank wire transfers, and transaction ledger.
+
+### 4. Admin Control Room (`/admin`)
+* **Access Control:** Restricted strictly to authenticated users with `role: 'admin'`. Hidden from public footers and navigation.
+* **Swap Desk:** Inspect vehicle photos, review AI valuation factors, adjust trade-in offers, and advance stages (`submitted` → `valued` → `accepted` → `scheduled` → `completed`).
+* **Payments Queue:** Review and approve/reject wallet top-ups with instant ledger credits.
+* **Account Management:** Adjust user roles, credit/debit balances, and reset accounts.
+* **Market Marking:** Update private equity marks for SpaceX and X Corp with instant real-time portfolio re-valuation.
+* **Communications & Broadcasts:** Publish dashboard alert banners and adjust global platform copy.
+
+### 5. Automated Concierge & Security
+* **Google SMTP Transactional Mail:** Automated dispatch of swap submissions, cart reservations, OTP verification codes, and sign-in alerts.
+* **SEO & Social Graphs:** Dynamic OpenGraph metadata, `robots.txt`, and automated `sitemap.xml`.
+* **Global Error Boundaries:** Native Next.js `error.tsx` catching runtime exceptions with clean recovery actions.
+
+---
+
+## 🛠️ Tech Stack & Architecture
 
 ```
 ├── public/                 # Static assets (Vehicle photography, 3D assets, icons)
-│   └── images/cars/        # High-resolution Tesla imagery (Cybertruck, Model 3, Y, S, Semi, Roadster)
+│   └── images/cars/        # High-res Tesla models (Cybertruck, Model 3/Y/S/X, Semi, Roadster)
 ├── src/
-│   ├── app/                # Next.js App Router routes
-│   │   ├── layout.tsx      # Root layout with TeslaXProvider & ToastContainer
-│   │   ├── page.tsx        # Homepage (Hero, ticker ribbon, how it works, lineup showcase)
-│   │   ├── lineup/         # Vehicle catalogue with live category filters & search
-│   │   │   ├── page.tsx
-│   │   │   └── [slug]/     # Interactive model detail & valuation entrypoint
-│   │   ├── swap/           # 2-step trade-in valuation wizard & financing calculator
-│   │   │   └── page.tsx
-│   │   ├── markets/        # Public interactive markets (TSLA NASDAQ feed, SpaceX & X marks)
-│   │   │   └── page.tsx
-│   │   ├── login/          # Member authentication with instant demo role switcher
-│   │   │   └── page.tsx
-│   │   ├── signup/         # Account registration flow
-│   │   │   └── page.tsx
-│   │   ├── verify/         # 6-digit email verification with demo autofill
-│   │   │   └── page.tsx
-│   │   ├── dashboard/      # Member Portal Shell
-│   │   │   ├── page.tsx    # Member Overview (KPIs, active swap progress, market watch)
-│   │   │   ├── swaps/      # Swap timeline history & detailed progress tracker
-│   │   │   ├── showroom/   # Applied trade-in credit vehicle reservation catalogue
-│   │   │   ├── markets/    # Trading desk with interactive charts & order ticket
-│   │   │   ├── portfolio/  # Real-time position value, cost basis, unrealised P/L
-│   │   │   ├── wallet/     # Balance management, simulated card top-up & bank transfers
-│   │   │   └── profile/    # Contact info & vehicle delivery address
-│   │   └── admin/          # Control Room (Administration Console)
-│   │       ├── page.tsx    # Admin Overview (Platform health, KPIs, pending payments)
-│   │       ├── swaps/      # Valuation desk & binding offer stage manager
-│   │       ├── payments/   # Wallet top-up approval/rejection queue
-│   │       ├── users/      # Member account management & wallet credit/debit adjuster
-│   │       ├── markets/    # Private valuation mark repricing & model sizing values
-│   │       └── comms/      # Dashboard announcement publisher & platform copy editor
+│   ├── app/                # Next.js App Router (43 static/dynamic routes)
+│   │   ├── api/            # Serverless API routes
+│   │   │   ├── auth/       # Login, signup, OTP send & verify
+│   │   │   ├── markets/    # Finnhub & Yahoo Finance market proxy
+│   │   │   ├── valuation/  # Gemini AI vehicle appraisal & 3-layer quota shield
+│   │   │   ├── swaps/      # Swap creation & stage updates
+│   │   │   ├── payments/   # Top-up approvals
+│   │   │   └── seed/       # Day-Zero database seeding endpoint
+│   │   ├── lineup/         # Vehicle catalogue & category filters
+│   │   ├── swap/           # Interactive 2-step trade-in wizard & photo uploader
+│   │   ├── markets/        # Public markets terminal & asset charts
+│   │   ├── dashboard/      # Member portal (Overview, Wallet, Portfolio, Showroom)
+│   │   └── admin/          # Admin Control Room (Swaps, Users, Payments, Comms)
 │   ├── components/         # Reusable UI & specialized components
-│   │   ├── Navbar.tsx      # Global sticky navbar with interactive role switcher
-│   │   ├── Footer.tsx      # Footer with brand, disclosures, and navigation
-│   │   ├── CarVisual.tsx   # Dual-mode vehicle rendering (real photo + vector blueprint)
-│   │   ├── chart.tsx       # Interactive SVG stock chart with timeframes (1D, 1W, 1M, 1Y, ALL)
-│   │   ├── PlanBox.tsx     # Monthly settlement calculator with flexible terms (12-60 mo)
-│   │   ├── PhotoUploader.tsx # Drag-and-drop vehicle photo uploader with preview
-│   │   ├── dashboard.tsx   # DashShell, Ico icons, and SwapPill badges
-│   │   ├── AdminShell.tsx  # Admin control room tabs & layout
-│   │   └── ui.tsx          # Alert, Empty, Raw, Brand, and Mark components
-│   ├── context/
-│   │   └── TeslaXContext.tsx # Centralised state management, ledger, orders, and persistent storage
-│   ├── data/
-│   │   └── models.ts       # Vehicle specifications, pricing, and inline SVG generators
-│   └── lib/
-│       ├── db.ts           # Core TypeScript interfaces, formatters (money, dates), and status constants
-│       ├── valuation.ts    # Algorithmic trade-in valuation engine based on age, mileage, condition
-│       ├── plan.ts         # Financing and settlement interest math
-│       └── market.ts       # Market series path generation and quote calculations
-└── original_hono_views/    # Preserved original template source files for reference
+│   │   ├── PhotoUploader.tsx # Modern drag-and-drop vehicle photo uploader
+│   │   ├── Navbar.tsx      # Global header with dynamic auth states
+│   │   ├── Footer.tsx      # Customer guarantees & hidden email concierge
+│   │   ├── chart.tsx       # Interactive SVG market chart
+│   │   └── CarVisual.tsx   # Dual-mode vector blueprints & photography
+│   └── lib/                # Core utilities & services
+│       ├── db-server.ts    # MongoDB Atlas connection manager & collections
+│       ├── valuation.ts    # Black Book automotive depreciation engine
+│       ├── valuation-cache.ts # In-memory 24h appraisal cache
+│       ├── rate-limit.ts   # In-memory IP rate limiter
+│       ├── market-service.ts # Finnhub & Yahoo Finance data aggregation
+│       └── email.ts        # Google SMTP mailer with custom HTML templates
 ```
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### 1. Development Server
+### Prerequisites
+* **Node.js**: v18.18+ or v20+
+* **MongoDB**: Atlas connection string or local MongoDB instance
+* **Google AI Studio Key**: Free Gemini API Key ([Google AI Studio](https://aistudio.google.com/app/apikey))
+* **Finnhub Key**: Free Stock API Key ([Finnhub.io](https://finnhub.io))
 
-Run the development server:
+### 1. Environment Configuration
+
+Create a `.env.local` file in the root directory:
+
+```env
+# MongoDB Atlas
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/teslax?retryWrites=true&w=majority
+
+# Next.js Base URL
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Authentication & Session Secret
+AUTH_SECRET=your-secure-jwt-secret-key
+
+# Google Gemini AI (Vehicle Appraisals)
+GEMINI_API_KEY=your-gemini-api-key
+
+# Finnhub Stock API (TSLA Quotes)
+FINNHUB_API_KEY=your-finnhub-api-key
+FINNHUB_WEBHOOK_SECRET=your-webhook-secret
+
+# Google SMTP (Email Concierge & OTPs)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+GOOGLE_SMTP_USER=your-email@gmail.com
+GOOGLE_SMTP_PASS=your-16-char-app-password
+SMTP_FROM="TeslaX Security & Concierge" <your-email@gmail.com>
+
+# Concierge Settings
+ADMIN_EMAIL=your-email@gmail.com
+CUSTOMER_CARE_EMAIL=your-email@gmail.com
+NEXT_PUBLIC_CONCIERGE_PHONE="+1 (937) 532-5145"
+NEXT_PUBLIC_CONCIERGE_EMAIL=your-email@gmail.com
+```
+
+### 2. Install Dependencies
 
 ```bash
+npm install
+```
+
+### 3. Initialize Database (Day-Zero Seed)
+
+To wipe legacy demo accounts and initialize clean official models, settings, and the solitary Superadmin:
+
+```bash
+# Start dev server first:
 npm run dev
+
+# In another terminal, trigger the seed endpoint:
+curl -s "http://localhost:3000/api/seed?target=dayzero-local"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 2. Production Build
-
-To compile TypeScript and build optimized static/dynamic routes:
-
-```bash
-npm run build
-```
-
-Then start the production server:
-
-```bash
-npm run start
-```
+> **Default Superadmin:** `muskspacex.teslax@gmail.com`  
+> **Password:** `teslax2026!`
 
 ---
 
-## Key Features
+## 💻 Development & Build Scripts
 
-1. **Trade-in Valuation Engine (`/swap`)**:
-   - Takes vehicle make, model, year, mileage, condition, service history, accident history, and photo.
-   - Calculates indicative valuation with itemised factor breakdown ("What moved the number").
-   - Interactive financing plan selector (terms from 12 to 60 months with 0% APR indications).
+| Command | Description |
+| :--- | :--- |
+| `npm run dev` | Starts local Next.js development server with Webpack. |
+| `npm run build` | Compiles TypeScript and creates optimized production build (`next build --webpack`). |
+| `npm run start` | Launches the compiled production server. |
+| `npm run lint` | Runs Next.js ESLint checks. |
 
-2. **Vehicle Catalogue (`/lineup` & `/dashboard/showroom`)**:
-   - Compares market price against internal TeslaX swap value.
-   - Categorised filters: Sedans, SUVs, Pickup (Cybertruck), Roadster, Commercial (Semi).
-   - Instant reservation against member trade-in credits.
+---
 
-3. **Trading Desk & Portfolio (`/dashboard/markets` & `/dashboard/portfolio`)**:
-   - Real-time SVG chart with interactive timeframe tabs and crosshairs.
-   - Paper trading execution for TSLA, SpaceX (SPCX), and X Corp (X).
-   - Real-time ledger entries, P/L percentage updates, and average cost calculations.
+## 🔒 Security Best Practices
 
-4. **Control Room Admin Console (`/admin`)**:
-   - Review pending swaps, adjust binding offers, and advance swap stages (`submitted` → `valued` → `accepted` → `scheduled` → `completed`).
-   - Confirm or reject member top-ups (instantly credits member wallet).
-   - Re-price private valuation marks for SpaceX and X (instant re-valuation of all member portfolios).
-   - Publish dashboard notices and adjust platform copy.
+1. **Anti-Bot & Quota Protection:** All external API endpoints are shielded against scrapers with invisible honeypots, rate limiting, and 24-hour response caching.
+2. **Environment Variables:** Private keys (`GEMINI_API_KEY`, `FINNHUB_API_KEY`, `GOOGLE_SMTP_PASS`, `MONGODB_URI`) are strictly kept in `.env.local` and never committed to version control.
+3. **Role-Based Routing:** Admin console routes and control components require server-verified `role === 'admin'` tokens.
 
-5. **Demo Role Switcher**:
-   - Directly available in the top right of the navigation bar: easily toggle between **Member** (`Ada Okafor`), **Admin** (`Control Room`), and **Guest** view.
+---
 
+## 📄 License
+
+Proprietary © TeslaX Platform. All rights reserved.
