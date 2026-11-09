@@ -91,8 +91,11 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ initialToken, onCh
     }
   }
 
-  const handleUrlImport = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleUrlImport = (e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     if (!urlInput.trim()) return
 
     const trimmed = urlInput.trim()
@@ -253,7 +256,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ initialToken, onCh
         <span className="absolute bg-[#0a0a0c] px-3 text-[11px] uppercase tracking-wider text-muted-2">or</span>
       </div>
 
-      <form onSubmit={handleUrlImport} className="space-y-1.5">
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[11px] text-muted">
           <span>Import from URL</span>
         </div>
@@ -262,11 +265,19 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ initialToken, onCh
             type="url"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                e.stopPropagation()
+                handleUrlImport(e)
+              }
+            }}
             placeholder="Paste image URL (https://...)"
             className="flex-1 bg-surface-2/60 border border-line rounded-lg px-3 py-1.5 text-xs text-white placeholder-muted focus:outline-none focus:border-emerald-500/50 transition-colors"
           />
           <button
-            type="submit"
+            type="button"
+            onClick={handleUrlImport}
             disabled={!urlInput.trim()}
             className="px-3.5 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed text-white border border-white/10 transition-colors"
           >
@@ -274,7 +285,7 @@ export const PhotoUploader: React.FC<PhotoUploaderProps> = ({ initialToken, onCh
           </button>
         </div>
         {urlError && <p className="text-[11px] text-rose-400 mt-1">{urlError}</p>}
-      </form>
+      </div>
     </div>
   )
 }
