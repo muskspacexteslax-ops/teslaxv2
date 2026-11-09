@@ -42,6 +42,7 @@ function SwapContent() {
   const [error, setError] = useState<string>('')
   const [isValuating, setIsValuating] = useState(false)
   const [valuationProgress, setValuationProgress] = useState('')
+  const [honeypot, setHoneypot] = useState('')
 
   const targetModel = models.find((m) => m.slug === targetSlug) || null
 
@@ -79,6 +80,7 @@ function SwapContent() {
       owners: owners || 1,
       service_history: serviceHistory,
       accident_history: accidentHistory,
+      honeypot,
     }
 
     try {
@@ -459,6 +461,20 @@ function SwapContent() {
             <form onSubmit={handleCalculate}>
               <div className="eyebrow no-rule" style={{ marginBottom: '16px' }}>
                 Your current car
+              </div>
+
+              {/* Invisible Honeypot Anti-Bot Shield */}
+              <div className="hidden" aria-hidden="true" style={{ display: 'none', position: 'absolute', left: '-9999px' }}>
+                <label htmlFor="preferred_contact_method">Preferred Contact Method</label>
+                <input
+                  id="preferred_contact_method"
+                  type="text"
+                  name="preferred_contact_method"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
               </div>
 
               <PhotoUploader initialToken={photoToken} onChange={(t) => setPhotoToken(t)} />
